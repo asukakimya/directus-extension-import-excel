@@ -14,7 +14,7 @@
 1. Clone the repository into your Directus `extensions/modules` folder:
 
 ```bash
-git clone https://github.com/FazCodeFR/directus-extension-import-excel.git ./extensions/modules/import-excel
+git clone https://github.com/FazCodeFR/directus-extension-import-excel.git ./extensions/televersement
 ```
 
 2. Restart your Directus instance to load the new module.
