@@ -3,67 +3,55 @@
 
 		<div class="step">
 			<h2>1. Choisissez la collection cible</h2>
-			<VSelect
-				v-model="selectedCollection"
-				:items="collections"
-				label="Collection"
-				placeholder="Sélectionnez une collection"
-				@update:modelValue="fetch"
-			/>
+			<VSelect v-model="selectedCollection" :items="collections" label="Collection"
+				placeholder="Sélectionnez une collection" @update:modelValue="fetch" />
 		</div>
 
 		<div class="step">
 			<h2>2. Importez un fichier Excel</h2>
-			<VInput
-				type="file"
-				@change="handleFileUpload"
-				accept=".xlsx, .xls"
-				label="Fichier Excel"
-				placeholder="Choisissez un fichier Excel"
-			/>
+			<VInput type="file" @change="handleFileUpload" accept=".xlsx, .xls" label="Fichier Excel"
+				placeholder="Choisissez un fichier Excel" />
 			<p class="info-text">Formats acceptés : .xlsx, .xls</p>
 		</div>
 
 		<div v-if="previewData.length" class="step">
-	<h2>3. Aperçu & Mapping</h2>
-	<p class="info-text">Attribuez un champ à chaque colonne, puis vérifiez les données : </p>
-	<div class="table-container">
-		<table class="preview-table">
-			<thead>
-				<tr>
-					<th v-for="(col, colIndex) in previewData[0]" :key="'header-' + colIndex">
-						Col {{ colIndex }}
-					</th>
-				</tr>
-				<tr>
-					<th v-for="(col, index) in previewData[0]" :key="'mapping-' + index">
-						<VSelect
-							v-model="mapping[index]"
-							:items="contactFields"
-							clearable
-							:fullWidth="false"
-							:inline="true"
-							placeholder="Champ"
-						/>
-					</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr v-for="(row, rowIndex) in previewData" :key="rowIndex">
-					<td v-for="(col, colIndex) in row" :key="colIndex">{{ col }}</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-</div>
+			<h2>3. Aperçu & Mapping</h2>
+			<p class="info-text">Attribuez un champ à chaque colonne, puis vérifiez les données : </p>
+			<div class="table-container">
+				<table class="preview-table">
+					<thead>
+						<tr>
+							<th v-for="(col, colIndex) in previewData[0]" :key="'header-' + colIndex">
+								Col {{ colIndex }}
+							</th>
+						</tr>
+						<tr>
+							<th v-for="(col, index) in previewData[0]" :key="'mapping-' + index">
+								<VSelect v-model="mapping[index]" :items="contactFields" clearable :fullWidth="false"
+									:inline="true" placeholder="Champ" />
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="(row, rowIndex) in previewData" :key="rowIndex">
+							<td v-for="(col, colIndex) in row" :key="colIndex">{{ col }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
 
 
 		<div v-if="selectedFile" class="step">
 			<h2>5. Importer</h2>
-			<VButton v-if="selectedFile" @click="importFile" :disabled="!selectedFile || !selectedCollection" color="primary">
+			<VButton v-if="selectedFile" @click="importFile" :disabled="!selectedFile || !selectedCollection"
+				color="primary">
 				Importer
 			</VButton>
 		</div>
+
+		<div v-if="successMessage" class="alert success">{{ successMessage }}</div>
+		<div v-if="errorMessage" class="alert error">{{ errorMessage }}</div>
 
 
 	</private-view>
@@ -86,6 +74,8 @@ export default {
 			contactFields: [],
 			collections: [],
 			selectedCollection: null,
+			successMessage: '',
+			errorMessage: '',
 		};
 	},
 	mounted() {
@@ -160,6 +150,9 @@ export default {
 		async importFile() {
 			if (!this.selectedFile || !this.selectedCollection) return;
 
+			this.successMessage = '';
+			this.errorMessage = '';
+
 			try {
 				const reader = new FileReader();
 
@@ -180,23 +173,34 @@ export default {
 					}).filter(item => Object.keys(item).length > 0);
 
 					if (itemsToCreate.length === 0) {
-						alert('Aucun item à importer, vérifiez le mapping.');
+						this.errorMessage = 'Aucun item à importer. Vérifiez le mapping.';
 						return;
 					}
 
-					const createdItems = await this.api.post(`/items/${this.selectedCollection}`, itemsToCreate);
+					console.log(itemsToCreate)
+					const createdItems = await this.api.post(
+						`/items/${this.selectedCollection}`,
+						itemsToCreate
+					);
 
-					console.log(`✅ ${itemsToCreate.length} éléments créés dans ${this.selectedCollection}`, createdItems);
-					alert(`Import terminé ! ${createdItems.data.data.length} éléments créés.`);
+					this.successMessage = `${createdItems.data.data.length} éléments importés avec succès.`;
+					console.log('✅ Import réussi', createdItems);
 				};
 
 				reader.readAsArrayBuffer(this.selectedFile);
-
 			} catch (err) {
 				console.error('❌ Erreur pendant l\'import :', err);
-				alert('Erreur pendant l\'import');
+
+				if (err.response?.data?.errors?.length) {
+					this.errorMessage = err.response.data.errors
+						.map(e => e.message)
+						.join('\n');
+				} else {
+					this.errorMessage = 'Une erreur est survenue pendant l’import.';
+				}
 			}
 		},
+
 
 		async fetch(collection) {
 			await this.fetchFields(collection);
@@ -268,6 +272,27 @@ export default {
 	min-width: 120px;
 	font-weight: 500;
 }
+
+.alert {
+	padding: 12px;
+	border-radius: 6px;
+	margin-top: 16px;
+	font-weight: 500;
+}
+
+.alert.success {
+	background-color: #e6f9ed;
+	color: #2e7d32;
+	border: 1px solid #a5d6a7;
+}
+
+.alert.error {
+	background-color: #fdecea;
+	color: #c62828;
+	border: 1px solid #ef9a9a;
+	white-space: pre-wrap;
+}
+
 
 /* Responsive */
 @media (max-width: 768px) {
