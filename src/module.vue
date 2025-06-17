@@ -166,7 +166,8 @@ export default {
 						const payload = {};
 						for (const [colIndex, field] of Object.entries(this.mapping)) {
 							if (field) {
-								payload[field] = row[colIndex];
+								// payload[field] = row[colIndex];
+								payload[field] = row[colIndex].toString().trim();
 							}
 						}
 						return payload;
