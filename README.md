@@ -5,9 +5,12 @@
 ## Features
 
 - Upload `.xlsx` files via custom interface
-- Manual mapping of file columns to Directus fields
-- Compatible with collections like `contacts`, `users`, etc.
-- Designed for back-office/admin import workflows
+- Manual mapping of file columns to Directus fields Collections
+- Supports multiple collections
+
+
+## Screenshots
+![Import Excel Module](https://raw.githubusercontent.com/FazCodeFR/directus-extension-import-excel/Screenshot_1.jpg)
 
 ## Installation
 
@@ -18,11 +21,10 @@ git clone https://github.com/FazCodeFR/directus-extension-import-excel.git ./ext
 ```
 
 2. Restart your Directus instance to load the new module.
-3. Navigate to the Directus admin panel and find the "Import Excel" module in the modules section.
-4. Configure the module settings as needed.
+3. Navigate to the Directus admin panel and find the "Téléversement" module in the modules section.
 5. Use the module to upload `.xlsx` files and map columns to your collection fields.
 ## Usage
-1. Go to the "Import Excel" module in the Directus admin panel.
+1. Go to the "Téléversement" module in the Directus admin panel.
 2. Upload your `.xlsx` file.
 3. Map the columns from your Excel file to the fields in your Directus collection.
 4. Click "Import" to start the import process.

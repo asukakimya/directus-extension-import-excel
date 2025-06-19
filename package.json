@@ -1,6 +1,6 @@
 {
 	"name": "televersement",
-	"description": "Please enter a description for your extension",
+	"description": "Directus extension import Excel file",
 	"icon": "extension",
 	"version": "1.0.0",
 	"keywords": [
