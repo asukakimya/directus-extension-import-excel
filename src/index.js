@@ -2,7 +2,7 @@
 
 export default {
 	id: 'custom',
-	name: 'Téléversement',
+	name: 'Import Excel',
 	icon: 'upload',
 	routes: [
 		{

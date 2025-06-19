@@ -1,3 +1,5 @@
+// Developing Directus extensions with hot-reloading
+// https://github.com/u12206050/directus-extension-dev-canvas
 import vue from '@vitejs/plugin-vue';
 import { defineConfig } from 'vite';
 

@@ -1,7 +1,7 @@
 {
-	"name": "televersement",
-	"description": "Directus extension import Excel file",
-	"icon": "extension",
+	"name": "directus-extension-import-excel",
+	"description": "Import Excel files (.xlsx) without headers and manually map them to Directus collections.",
+	"icon": "upload_file",
 	"version": "1.0.0",
 	"keywords": [
 		"directus",
@@ -12,12 +12,14 @@
 	"files": [
 		"dist"
 	],
+	"author": "FazCode",
 	"directus:extension": {
 		"type": "module",
 		"path": "dist/index.js",
 		"source": "src/index.js",
-		"host": "^10.10.0"
+		"host": "^11.8.0"
 	},
+	"license": "MIT",
 	"scripts": {
 		"start": "vite",
 		"build": "directus-extension build",
