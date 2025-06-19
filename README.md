@@ -10,7 +10,7 @@
 
 
 ## Screenshots
-![Import Excel Module](https://raw.githubusercontent.com/FazCodeFR/directus-extension-import-excel/Screenshot_1.jpg)
+![Import Excel Module](https://raw.githubusercontent.com/FazCodeFR/directus-extension-import-excel/refs/heads/main/Screenshot_1.jpg)
 
 ## Installation
 
