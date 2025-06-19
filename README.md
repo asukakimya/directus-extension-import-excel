@@ -14,7 +14,7 @@
 
 ## Installation
 
-1. Clone the repository into your Directus `extensions/modules` folder:
+1. Clone the repository into your Directus `extensions` folder:
 
 ```bash
 git clone https://github.com/FazCodeFR/directus-extension-import-excel.git ./extensions/televersement
