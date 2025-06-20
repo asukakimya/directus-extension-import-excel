@@ -1,9 +1,9 @@
 // import ModuleComponent from './module.vue';
 
 export default {
-	id: 'custom',
-	name: 'Excel Yükle',
-	icon: 'upload',
+	id: 'import_excel',
+	name: 'Excelden İçeri Aktar',
+	icon: 'sheets_rtl',
 	routes: [
 		{
 			path: '',
