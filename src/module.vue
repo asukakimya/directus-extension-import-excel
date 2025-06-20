@@ -22,7 +22,7 @@
             </tr>
             <tr>
               <th v-for="(col, index) in previewData[0]" :key="'mapping-' + index">
-                <VSelect v-model="mapping[index]" :items="contactFields" clearable :inline="true" placeholder="Sütun seçin" />
+                <VSelect v-model="mapping[index]" :items="contactFields" item-text="label" item-value="value" clearable :inline="true" placeholder="Sütun seçin" />
               </th>
             </tr>
           </thead>
@@ -51,27 +51,28 @@ import { useApi, useStores } from "@directus/extensions-sdk";
 import * as XLSX from "xlsx";
 
 const api = useApi();
-const { useSettingsStore, useCollectionsStore } = useStores();
-const settingsStore = useSettingsStore();
+const { useCollectionsStore } = useStores();
 const collectionsStore = useCollectionsStore();
-// const projectLanguage = computed(() => settingsStore.settings.project_language || "en-US");
+const projectLanguage = ref("en-US"); // fallback
 
+async function fetchProjectInfo() {
+  try {
+    const response = await api.get("/server/info");
+    projectLanguage.value = response.data.data.project.default_language || "en-US";
+    console.log("System Lang:", projectLanguage.value);
+  } catch (err) {
+    console.error("Failed to get project info:", err);
+  }
+}
+
+// ✅ Koleksiyonlar: name zaten ilgili dilde → direkt kullan
 const rawCollections = computed(() => collectionsStore.visibleCollections.filter((col) => col.schema && col.schema.name));
 
-const collections = computed(
-  () =>
-    rawCollections.value.map((col) => {
-      // let label = col.collection;
-      // const translations = col.meta?.translations;
-      // if (Array.isArray(translations) && translations.length > 0) {
-      //   const match = translations.find((t) => t.language === projectLanguage.value);
-      //   if (match?.translation) label = match.translation;
-      // }
-      return {
-        value: col.collection,
-        label: col.name,
-      };
-    })
+const collections = computed(() =>
+  rawCollections.value.map((col) => ({
+    value: col.collection,
+    label: col.name,
+  }))
 );
 
 const selectedCollection = ref(null);
@@ -83,16 +84,28 @@ const successMessage = ref("");
 const errorMessage = ref("");
 
 onMounted(async () => {
+  await fetchProjectInfo();
   selectedCollection.value = collections.value[0]?.value || null;
   if (selectedCollection.value) {
     await fetchFields(selectedCollection.value);
   }
 });
 
+// ✅ Alanlar: meta.translations ile çeviri, fallback field adı
 async function fetchFields(collection) {
   try {
     const response = await api.get(`/fields/${collection}`);
-    contactFields.value = response.data.data.filter((f) => !f.field.startsWith("$")).map((f) => f.field);
+    contactFields.value = response.data.data
+      .filter((f) => !f.field.startsWith("$"))
+      .map((f) => {
+        let label = f.field;
+        const translations = f.meta?.translations;
+        if (Array.isArray(translations) && translations.length > 0) {
+          const match = translations.find((t) => t.language === projectLanguage.value);
+          if (match?.translation) label = match.translation;
+        }
+        return { value: f.field, label };
+      });
   } catch (err) {
     console.error(`Alanlar alınamadı: ${err}`);
   }
