@@ -205,7 +205,7 @@ async function importFile() {
 }
 
 .alert {
-  padding: 12px;
+  padding: 12px 46px;
   border-radius: 6px;
   margin-top: 16px;
 }
