@@ -2,7 +2,7 @@
 
 export default {
 	id: 'custom',
-	name: 'Import Excel',
+	name: 'Excel Yükle',
 	icon: 'upload',
 	routes: [
 		{
