@@ -1,22 +1,22 @@
 <template>
-	<private-view title="Importer un fichier Excel" class="import-excel-module">
+	<private-view title="Bir Excel dosyasını içe aktarın" class="import-excel-module">
 
 		<div class="step">
-			<h2>1. Choisissez la collection cible</h2>
-			<VSelect v-model="selectedCollection" :items="collections" label="Collection"
-				placeholder="Sélectionnez une collection" @update:modelValue="fetch" />
+			<h2>1. Hedef koleksiyonu seçin</h2>
+			<VSelect v-model="selectedCollection" :items="collections" label="Koleksiyon"
+				placeholder="Bir koleksiyon seçin" @update:modelValue="fetch" />
 		</div>
 
 		<div class="step">
 			<h2>2. Importez un fichier Excel</h2>
-			<VInput type="file" @change="handleFileUpload" accept=".xlsx, .xls" label="Fichier Excel"
-				placeholder="Choisissez un fichier Excel" />
-			<p class="info-text">Formats acceptés : .xlsx, .xls</p>
+			<VInput type="file" @change="handleFileUpload" accept=".xlsx, .xls" label="Excel dosyası"
+				placeholder="Excel dosyası seçin" />
+			<p class="info-text">Kabul edilen formatlar: .xlsx, .xls</p>
 		</div>
 
 		<div v-if="previewData.length" class="step">
-			<h2>3. Aperçu & Mapping</h2>
-			<p class="info-text">Attribuez un champ à chaque colonne, puis vérifiez les données : </p>
+			<h2>3. Genel Bakış ve Eşleştirme</h2>
+			<p class="info-text">Her sütuna bir alan atayın, ardından verileri kontrol edin:</p>
 			<div class="table-container">
 				<table class="preview-table">
 					<thead>
@@ -28,7 +28,7 @@
 						<tr>
 							<th v-for="(col, index) in previewData[0]" :key="'mapping-' + index">
 								<VSelect v-model="mapping[index]" :items="contactFields" clearable :fullWidth="false"
-									:inline="true" placeholder="Champ" />
+									:inline="true" placeholder="Seçin" />
 							</th>
 						</tr>
 					</thead>
@@ -43,10 +43,10 @@
 
 
 		<div v-if="selectedFile" class="step">
-			<h2>5. Importer</h2>
+			<h2>4. Yükleme</h2>
 			<VButton v-if="selectedFile" @click="importFile" :disabled="!selectedFile || !selectedCollection"
 				color="primary">
-				Importer
+				Yükle
 			</VButton>
 		</div>
 
@@ -102,11 +102,11 @@ export default {
 					await this.fetchFields(this.selectedCollection);
 				}
 
-				console.log('✅ Collections récupérées :', this.collections);
+				console.log('✅ Kurtarılan koleksiyonlar:', this.collections);
 
 
 			} catch (err) {
-				console.error('❌ Erreur lors de la récupération des collections :', err);
+				console.error('❌ Koleksiyonlar alınırken hata oluştu:', err);
 			}
 		},
 
@@ -117,9 +117,9 @@ export default {
 					.filter(f => !f.field.startsWith('$'))
 					.map(f => f.field);
 
-				console.log(`✅ Champs récupérés pour ${collection} :`, this.contactFields);
+				console.log(`✅ ${collection} için alınan alanlar:`, this.contactFields);
 			} catch (err) {
-				console.error(`❌ Erreur lors de la récupération des champs pour ${collection} :`, err);
+				console.error(`❌ ${collection} için alanları alırken hata oluştu:`, err);
 			}
 		},
 
@@ -174,7 +174,7 @@ export default {
 					}).filter(item => Object.keys(item).length > 0);
 
 					if (itemsToCreate.length === 0) {
-						this.errorMessage = 'Aucun item à importer. Vérifiez le mapping.';
+						this.errorMessage = 'İçe aktarılacak öğe yok. Eşlemeyi kontrol edin.';
 						return;
 					}
 
@@ -184,20 +184,20 @@ export default {
 						itemsToCreate
 					);
 
-					this.successMessage = `${createdItems.data.data.length} éléments importés avec succès.`;
-					console.log('✅ Import réussi', createdItems);
+					this.successMessage = `${createdItems.data.data.length} öğe başarıyla içe aktarıldı.`;
+					console.log('✅ İçe aktarma başarılı', createdItems);
 				};
 
 				reader.readAsArrayBuffer(this.selectedFile);
 			} catch (err) {
-				console.error('❌ Erreur pendant l\'import :', err);
+				console.error('❌ İçe aktarma sırasında hata:', err);
 
 				if (err.response?.data?.errors?.length) {
 					this.errorMessage = err.response.data.errors
 						.map(e => e.message)
 						.join('\n');
 				} else {
-					this.errorMessage = 'Une erreur est survenue pendant l’import.';
+					this.errorMessage = 'İçe aktarma sırasında bir hata oluştu.';
 				}
 			}
 		},
