@@ -27,8 +27,8 @@
 						</tr>
 						<tr>
 							<th v-for="(col, index) in previewData[0]" :key="'mapping-' + index">
-								<VSelect v-model="mapping[index]" :items="contactFields" clearable :fullWidth="false"
-									:inline="true" placeholder="Champ" />
+								<VSelect v-model="mapping[index]" :items="getAvailableFields(index)" clearable
+									:fullWidth="false" :inline="true" placeholder="Champ" />
 							</th>
 						</tr>
 					</thead>
@@ -82,6 +82,14 @@ export default {
 		this.fetchCollections();
 	},
 	methods: {
+		getAvailableFields(currentIndex) {
+			const usedFields = Object.entries(this.mapping)
+				.filter(([index, value]) => value && Number(index) !== currentIndex)
+				.map(([, value]) => value);
+
+			return this.contactFields.filter(field => !usedFields.includes(field));
+		},
+
 		async fetchCollections() {
 			try {
 				// const response = await this.api.get('/collections');
@@ -166,12 +174,13 @@ export default {
 						const payload = {};
 						for (const [colIndex, field] of Object.entries(this.mapping)) {
 							if (field) {
-								// payload[field] = row[colIndex];
-								payload[field] = row[colIndex].toString().trim();
+								const cell = row[colIndex];
+								payload[field] = cell !== undefined && cell !== null ? cell.toString().trim() : '';
 							}
 						}
 						return payload;
 					}).filter(item => Object.keys(item).length > 0);
+
 
 					if (itemsToCreate.length === 0) {
 						this.errorMessage = 'Aucun item à importer. Vérifiez le mapping.';
