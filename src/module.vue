@@ -173,8 +173,10 @@ export default {
 						const payload = {};
 						for (const [colIndex, field] of Object.entries(this.mapping)) {
 							if (field) {
-								const cell = row[colIndex];
-								payload[field] = cell !== undefined && cell !== null ? cell.toString().trim() : '';
+								const value = cell !== undefined && cell !== null ? cell.toString().trim() : null;
+								if (value !== '' && value !== null) {
+									payload[field] = value;
+								}
 							}
 						}
 						return payload;
