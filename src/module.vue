@@ -154,17 +154,16 @@ export default {
 			};
 			reader.readAsArrayBuffer(file);
 		},
-
 		async importFile() {
 			if (!this.selectedFile || !this.selectedCollection) return;
 
 			this.successMessage = '';
 			this.errorMessage = '';
 
-			try {
-				const reader = new FileReader();
+			const reader = new FileReader();
 
-				reader.onload = async (e) => {
+			reader.onload = async (e) => {
+				try {
 					const data = new Uint8Array(e.target.result);
 					const workbook = XLSX.read(data, { type: 'array' });
 					const sheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -181,13 +180,11 @@ export default {
 						return payload;
 					}).filter(item => Object.keys(item).length > 0);
 
-
 					if (itemsToCreate.length === 0) {
 						this.errorMessage = 'Aucun item à importer. Vérifiez le mapping.';
 						return;
 					}
 
-					console.log(itemsToCreate)
 					const createdItems = await this.api.post(
 						`/items/${this.selectedCollection}`,
 						itemsToCreate
@@ -195,21 +192,24 @@ export default {
 
 					this.successMessage = `${createdItems.data.data.length} éléments importés avec succès.`;
 					console.log('✅ Import réussi', createdItems);
-				};
+				} catch (err) {
+					console.error('❌ Erreur pendant l\'import (onload):', err);
 
-				reader.readAsArrayBuffer(this.selectedFile);
-			} catch (err) {
-				console.error('❌ Erreur pendant l\'import :', err);
-
-				if (err.response?.data?.errors?.length) {
-					this.errorMessage = err.response.data.errors
-						.map(e => e.message)
-						.join('\n');
-				} else {
-					this.errorMessage = 'Une erreur est survenue pendant l’import.';
+					if (err.response?.data?.errors?.length) {
+						this.errorMessage = err.response.data.errors
+							.map(e => e.message)
+							.join('\n');
+					} else if (err.message) {
+						this.errorMessage = err.message;
+					} else {
+						this.errorMessage = 'Une erreur est survenue pendant l’import.';
+					}
 				}
-			}
+			};
+
+			reader.readAsArrayBuffer(this.selectedFile);
 		},
+
 
 
 		async fetch(collection) {
