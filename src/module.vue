@@ -173,7 +173,10 @@ export default {
 						const payload = {};
 						for (const [colIndex, field] of Object.entries(this.mapping)) {
 							if (field) {
+								const cell = row[colIndex];
 								const value = cell !== undefined && cell !== null ? cell.toString().trim() : null;
+
+								// N'inclut que les champs ayant une valeur non vide
 								if (value !== '' && value !== null) {
 									payload[field] = value;
 								}
@@ -181,6 +184,7 @@ export default {
 						}
 						return payload;
 					}).filter(item => Object.keys(item).length > 0);
+
 
 					if (itemsToCreate.length === 0) {
 						this.errorMessage = 'Aucun item à importer. Vérifiez le mapping.';
