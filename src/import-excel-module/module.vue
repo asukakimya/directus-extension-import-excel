@@ -1,60 +1,93 @@
 <template>
-	<private-view title="Importer un fichier Excel" class="import-excel-module">
-		<div class="step">
-			<h2>1️⃣ Choisissez la collection cible</h2>
-			<h2>Trad : {{ t('step1') }}</h2>
-			<VSelect v-model="selectedCollection" :items="collections" item-text="label" item-value="value"
-				label="Collection" @update:modelValue="fetchFields" />
-		</div>
+  <private-view :title="t('uploadExcelFile')" class="import-excel-module">
+    <div class="step">
+      <h2>{{ t('chooseCollection') }}</h2>
+      <VSelect
+        v-model="selectedCollection"
+        :items="collections"
+        item-text="label"
+        item-value="value"
+        :label="t('selectCollectionPlaceholder')"
+        @update:modelValue="fetchFields"
+      />
+    </div>
 
-		<div class="step">
-			<h2>2️⃣ Importez un fichier Excel</h2>
-			<VInput type="file" @change="handleFileUpload" accept=".xlsx, .xls" label="Fichier Excel"
-				placeholder="Choisissez un fichier Excel" />
-			<p class="info-text">Formats acceptés : .xlsx, .xls</p>
-		</div>
+    <div class="step">
+      <h2>{{ t('uploadExcelFile') }}</h2>
+      <VInput
+        type="file"
+        @change="handleFileUpload"
+        accept=".xlsx, .xls"
+        :label="t('fileLabel')"
+        :placeholder="t('filePlaceholder')"
+      />
+      <p class="info-text">{{ t('acceptedFormats') }}</p>
+    </div>
 
-		<div v-if="previewData.length" class="step">
-			<h2>3️⃣ Mappage des colonnes</h2>
-			<p class="info-text">Associez chaque colonne du fichier à un champ dans la base de données. Un aperçu des
-				premières lignes est affiché.</p>
+    <div v-if="previewData.length" class="step">
+      <h2>{{ t('columnMapping') }}</h2>
+      <p class="info-text">{{ t('columnMappingHelp') }}</p>
 
-			<div class="mapping-table">
-				<div class="mapping-row header">
-					<div class="column">Colonne source</div>
-					<div class="column">Exemple de données</div>
-					<div class="column">Champ cible</div>
-				</div>
+      <div class="mapping-table">
+        <div class="mapping-row header">
+          <div class="column">{{ t('sourceColumn') }}</div>
+          <div class="column">{{ t('exampleData') }}</div>
+          <div class="column">{{ t('targetField') }}</div>
+        </div>
 
-				<div v-for="(col, index) in previewData[0]" :key="'mapping-row-' + index" class="mapping-row">
-					<div class="column">Colonne {{ index + 1 }}</div>
+        <div v-for="(col, index) in previewData[0]" :key="'mapping-row-' + index" class="mapping-row">
+          <div class="column"> {{ t('Column') }} {{ index + 1 }}</div>
 
-					<div class="column example-data">
-						<div v-for="row in previewData.slice(0, 3)" :key="'example-' + index + '-' + row[index]">
-							{{ row[index] }}
-						</div>
-					</div>
+          <div class="column example-data">
+            <div v-for="row in previewData.slice(0, 3)" :key="'example-' + index + '-' + row[index]">
+              {{ row[index] }}
+            </div>
+          </div>
 
-					<div class="column">
-						<VSelect v-model="mapping[index]" :items="getAvailableFields(index)" item-text="label"
-							item-value="value" clearable placeholder="Champ" />
-					</div>
-				</div>
-			</div>
-		</div>
+          <div class="column">
+            <VSelect
+              v-model="mapping[index]"
+              :items="getAvailableFields(index)"
+              item-text="label"
+              item-value="value"
+              clearable
+              :placeholder="t('selectFieldPlaceholder')"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
 
+    <div v-if="previewData.length && contactFields.length" class="step">
+      <h2>{{ t('keyFieldTitle') }}</h2>
+      <VSelect
+        v-model="keyField"
+        :items="contactFields"
+        item-text="label"
+        item-value="value"
+        :label="t('keyFieldLabel')"
+        :placeholder="t('selectKeyFieldPlaceholder')"
+        clearable
+      />
+      <p class="info-text">{{ t('keyFieldHelp1') }}</p>
+      <p class="info-text">{{ t('keyFieldHelp2') }}</p>
+    </div>
 
-		<div v-if="selectedFile" class="step">
-			<h2>4️⃣ Importer</h2>
-			<VButton @click="importFile" :disabled="!selectedCollection" color="primary" :xLarge="true">
-				Importer
-			</VButton>
-		</div>
+    <div v-if="selectedFile" class="step">
+      <h2>{{ t('importTitle') }}</h2>
+      <VButton
+        @click="importFile"
+        :disabled="!selectedCollection"
+        color="primary"
+        :xLarge="true"
+      >
+        {{ t('importButton') }}
+      </VButton>
+    </div>
 
-
-		<div v-if="successMessage" class="alert success">{{ successMessage }}</div>
-		<div v-if="errorMessage" class="alert error">{{ errorMessage }}</div>
-	</private-view>
+    <div v-if="successMessage" class="alert success">{{ successMessage }}</div>
+    <div v-if="errorMessage" class="alert error">{{ errorMessage }}</div>
+  </private-view>
 </template>
 
 <script setup>
@@ -62,7 +95,8 @@ import { ref, computed, onMounted } from 'vue';
 import { useApi, useStores } from '@directus/extensions-sdk';
 import * as XLSX from 'xlsx';
 import { useI18n } from 'vue-i18n';
-import { resolveLocale } from '../shared/i18n';
+import { resolveLocale, messages } from '../shared/i18n';
+
 
 // Stores et API
 const api = useApi();
@@ -78,63 +112,20 @@ const previewData = ref([]);
 const mapping = ref({});
 const successMessage = ref('');
 const errorMessage = ref('');
-const projectLanguage = ref('en-US');
+const projectLanguage = ref('');
 
-// 🔄 Récupère la langue du projet
+const keyField = ref('');
+
+// 🔄 Retrieves the project language
 async function fetchProjectInfo() {
   try {
     const response = await api.get('/server/info');
     projectLanguage.value = response.data.data.project.default_language || 'en-US';
-    console.log('✅ Langue du projet :', projectLanguage.value);
+    console.log('✅ Project language :', projectLanguage.value);
   } catch (err) {
-    console.error('❌ Impossible de récupérer la langue du projet', err);
+    console.error('❌ Unable to retrieve the project language', err);
   }
 }
-
-// Accès à la langue via le store Directus
-// const { useSettingsStore } = useStores();
-// const settingsStore = useSettingsStore();
-// const defaultLanguage = resolveLocale(settingsStore.settings?.default_language || 'en');
-
-// Traductions locales
-const messages = {
-  'en-US': {
-    choose_collection: 'Choose target collection',
-    import_excel: 'Upload an Excel file',
-    preview_mapping: 'Preview & Mapping',
-    import_button: 'Import',
-    choose_file: 'Choose an Excel file',
-    success: 'Import successful.',
-    error: 'An error occurred during import.',
-    step1: '1️⃣ Choose the target collection',
-    step2: '2️⃣ Upload an Excel file',
-    step3: '3️⃣ Preview & Mapping',
-    step4: '4️⃣ Import',
-    accepted_formats: 'Accepted formats: .xlsx, .xls',
-    no_valid_items: 'No valid items to import. Check the mapping.',
-    column: 'Column',
-    field: 'Field',
-    imported_success: 'items imported successfully.',
-  },
-  'fr_FR': {
-    choose_collection: 'Choisissez la collection cible',
-    import_excel: 'Importez un fichier Excel',
-    preview_mapping: 'Aperçu & Mapping',
-    import_button: 'Importer',
-    choose_file: 'Choisissez un fichier Excel',
-    success: 'Import réussi.',
-    error: 'Une erreur est survenue pendant l’import.',
-    step1: '1️⃣ Choisissez la collection cible',
-    step2: '2️⃣ Importez un fichier Excel',
-    step3: '3️⃣ Aperçu & Mapping',
-    step4: '4️⃣ Importer',
-    accepted_formats: 'Formats acceptés : .xlsx, .xls',
-    no_valid_items: 'Aucun élément valide à importer. Vérifiez le mapping.',
-    column: 'Colonne',
-    field: 'Champ',
-    imported_success: 'éléments importés avec succès.',
-  },
-};
 
 const { t } = useI18n({
   locale: projectLanguage.value,
@@ -142,7 +133,7 @@ const { t } = useI18n({
 });
 
 
-// 🔄 Récupère les collections visibles
+// 🔄 Retrieves visible collections
 const availableCollections = computed(() =>
   collectionsStore.visibleCollections
     .filter((col) => col.schema && col.schema.name)
@@ -150,9 +141,10 @@ const availableCollections = computed(() =>
       value: col.collection,
       label: col.name,
     }))
+    .sort((a, b) => a.label.localeCompare(b.label))
 );
 
-// 🔄 Récupère les champs de la collection sélectionnée
+// 🔄 Retrieves fields from the selected collection
 async function fetchFields(collection) {
   try {
     const response = await api.get(`/fields/${collection}`);
@@ -168,22 +160,25 @@ async function fetchFields(collection) {
         return { value: f.field, label };
       });
 
-    console.log(`✅ Champs récupérés pour ${collection} :`, contactFields.value);
+    console.log(`✅ Fields recovered for ${collection} :`, contactFields.value);
   } catch (err) {
-    console.error(`❌ Erreur lors de la récupération des champs pour ${collection} :`, err);
+    console.error(`❌ Error retrieving fields for ${collection} :`, err);
   }
 }
 
-// ⚙️ Filtrer les champs pour éviter les doublons dans le mapping
+// ⚙️ Filter fields to avoid duplicate mapping
 function getAvailableFields(currentIndex) {
   const usedFields = Object.entries(mapping.value)
     .filter(([index, value]) => value && Number(index) !== currentIndex)
     .map(([, value]) => value);
 
-  return contactFields.value.filter(field => !usedFields.includes(field.value));
+  return contactFields.value
+    .filter(field => !usedFields.includes(field.value))
+    .sort((a, b) => a.label.localeCompare(b.label)); // tri alphabétique
 }
 
-// 📤 Import du fichier Excel
+
+// 📤 Import Excel file
 async function importFile() {
   if (!selectedFile.value || !selectedCollection.value) return;
 
@@ -196,20 +191,24 @@ async function importFile() {
     formData.append('collection', selectedCollection.value);
     formData.append('mapping', JSON.stringify(mapping.value));
 
+    // optional: send keyfield for upsert
+    if (keyField.value) {
+      formData.append('keyField', keyField.value);
+    }
+
     const response = await api.post('/excel-import-api', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
 
-    successMessage.value = response.data.message || 'Import réussi.';
-    console.log('✅ Import réussi', response);
+    successMessage.value = response.data.message || 'Import OK.';
+    console.log('✅ Successful import', response);
   } catch (err) {
-    console.error('❌ Erreur lors de l’import :', err);
-    errorMessage.value = err?.response?.data?.message || 'Une erreur est survenue pendant l’import.';
+    console.error('❌ Error when importing :', err);
+    errorMessage.value = err?.response?.data?.message || 'An error has occurred during import.';
   }
 }
 
-
-// 📁 Gérer l'upload du fichier
+// 📁 Manage file upload
 function handleFileUpload(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -259,7 +258,7 @@ onMounted(async () => {
 
 .mapping-row {
   display: grid;
-  grid-template-columns: 1fr 1fr 2fr; /* Adapte selon le nombre et la taille des colonnes */
+  grid-template-columns: 1fr 1fr 2fr;
   gap: 20px;
   align-items: center;
 }
