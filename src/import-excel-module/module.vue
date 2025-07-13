@@ -1,22 +1,22 @@
 <template>
-	<private-view title="Importer un fichier Excel" class="import-excel-module">
+	<private-view title="Importer un fichier Excel 222222" class="import-excel-module">
 
 		<div class="step">
-			<h2>1. Choisissez la collection cible</h2>
+			<h2> 1️⃣Choisissez la collection cible</h2>
 			<VSelect v-model="selectedCollection" :items="collections" label="Collection"
 				placeholder="Sélectionnez une collection" @update:modelValue="fetch" />
 		</div>
 
 		<div class="step">
-			<h2>2. Importez un fichier Excel</h2>
+			<h2>2️⃣ Importez un fichier Excel</h2>
 			<VInput type="file" @change="handleFileUpload" accept=".xlsx, .xls" label="Fichier Excel"
 				placeholder="Choisissez un fichier Excel" />
 			<p class="info-text">Formats acceptés : .xlsx, .xls</p>
 		</div>
 
 		<div v-if="previewData.length" class="step">
-			<h2>3. Aperçu & Mapping</h2>
-			<p class="info-text">Attribuez un champ à chaque colonne, puis vérifiez les données : </p>
+			<h2>3️⃣ Aperçu & Mapping</h2>
+			<p class="info-text">Associer chaque colonne au champ cible : </p>
 			<div class="table-container">
 				<table class="preview-table">
 					<thead>
@@ -43,7 +43,7 @@
 
 
 		<div v-if="selectedFile" class="step">
-			<h2>5. Importer</h2>
+			<h2>4️⃣ Importer</h2>
 			<VButton v-if="selectedFile" @click="importFile" :disabled="!selectedFile || !selectedCollection"
 				color="primary">
 				Importer
@@ -191,13 +191,13 @@ export default {
 						return;
 					}
 
-					const createdItems = await this.api.post(
+					const result = await this.api.post(
 						`/items/${this.selectedCollection}`,
 						itemsToCreate
 					);
 
-					this.successMessage = `${createdItems.data.data.length} éléments importés avec succès.`;
-					console.log('✅ Import réussi', createdItems);
+					this.successMessage = `${result.data.data.length} éléments importés avec succès.`;
+					console.log('✅ Import réussi', result);
 				} catch (err) {
 					console.error('❌ Erreur pendant l\'import (onload):', err);
 
@@ -212,11 +212,8 @@ export default {
 					}
 				}
 			};
-
 			reader.readAsArrayBuffer(this.selectedFile);
 		},
-
-
 
 		async fetch(collection) {
 			await this.fetchFields(collection);
@@ -228,93 +225,54 @@ export default {
 
 
 <style scoped>
-.headline {
-	font-size: 1.4rem;
-	font-weight: bold;
-	margin-bottom: 24px;
-	line-height: 1.6;
-}
-
 .step {
-	margin-bottom: 32px;
-}
-
-.step h2 {
-	font-size: 1.1rem;
-	font-weight: 600;
-	margin-bottom: 12px;
-}
-
-.info-text {
-	font-size: 0.9rem;
-	color: #666;
-	margin-top: 4px;
+  margin-bottom: 30px;
+  padding: 0 46px;
 }
 
 .table-container {
-	overflow-x: auto;
-	border: 1px solid #ccc;
-	border-radius: 6px;
+  overflow-x: auto;
+  border: 1px solid var(--theme--border-normal);
+  border-radius: 6px;
 }
 
 .preview-table {
-	width: 100%;
-	border-collapse: collapse;
-	font-size: 0.9rem;
+  width: 100%;
+  border-collapse: collapse;
 }
 
 .preview-table th,
 .preview-table td {
-	padding: 8px 12px;
-	border: 1px solid #ccc;
-	text-align: left;
+  border: 1px solid var(--theme--border-normal);
+  padding: 8px;
 }
 
 .preview-table th {
-	background-color: #f5f5f5;
-	font-style: italic;
-	color: #555;
+  background: var(--theme--background-subdued);
+  color: var(--theme--foreground);
+  font-weight: 600;
 }
 
-.mapping-row {
-	display: flex;
-	align-items: center;
-	flex-wrap: wrap;
-	gap: 12px;
-	margin-bottom: 12px;
-}
-
-.mapping-row label {
-	min-width: 120px;
-	font-weight: 500;
+.preview-table td {
+  background: var(--theme--background);
+  color: var(--theme--foreground);
 }
 
 .alert {
-	padding: 12px;
-	border-radius: 6px;
-	margin-top: 16px;
-	font-weight: 500;
+  padding: 12px 46px;
+  border-radius: 6px;
+  margin-top: 16px;
 }
 
 .alert.success {
-	background-color: #e6f9ed;
-	color: #2e7d32;
-	border: 1px solid #a5d6a7;
+  background: var(--theme--success-background, #e0ffe0);
+  color: var(--theme--success-foreground, #067d06);
+  border: 1px solid var(--theme--success-border, #9de89d);
 }
 
 .alert.error {
-	background-color: #fdecea;
-	color: #c62828;
-	border: 1px solid #ef9a9a;
-	white-space: pre-wrap;
-}
-
-
-/* Responsive */
-@media (max-width: 768px) {
-	.mapping-row {
-		flex-direction: column;
-		align-items: flex-start;
-	}
+  background: var(--theme--danger-background, #ffe0e0);
+  color: var(--theme--danger-foreground, #c00);
+  border: 1px solid var(--theme--danger-border, #ef9a9a);
 }
 </style>

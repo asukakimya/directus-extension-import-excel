@@ -2,37 +2,52 @@
 	"name": "directus-extension-import-excel",
 	"description": "Import Excel files (.xlsx) without headers and manually map them to Directus collections.",
 	"icon": "upload_file",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"keywords": [
 		"directus",
 		"directus-extension",
-		"directus-extension-module"
+		"directus-extension-bundle"
 	],
+	"author": "FazCode",
+	"license": "MIT",
 	"type": "module",
 	"files": [
 		"dist"
 	],
-	"author": "FazCode",
 	"directus:extension": {
-		"type": "module",
-		"path": "dist/index.js",
-		"source": "src/index.js",
-		"host": "^11.8.0"
+		"type": "bundle",
+		"path": {
+			"app": "dist/app.js",
+			"api": "dist/api.js"
+		},
+		"entries": [
+			{
+				"type": "module",
+				"name": "import-excel-module",
+				"source": "src/import-excel-module/index.js"
+			},
+			{
+				"type": "endpoint",
+				"name": "excel-import-api",
+				"source": "src/excel-import-api/index.js"
+			}
+		],
+		"host": "^10.8.0"
 	},
-	"license": "MIT",
 	"scripts": {
 		"start": "vite",
 		"build": "directus-extension build",
 		"dev": "directus-extension build -w --no-minify",
 		"link": "directus-extension link",
-		"validate": "directus-extension validate"
-	},
-	"devDependencies": {
-		"@directus/extensions-sdk": "^14.0.0",
-		"vue": "^3.5.16"
+		"validate": "directus-extension validate",
+		"add": "directus-extension add"
 	},
 	"dependencies": {
 		"@directus/sdk": "^20.0.0",
 		"xlsx": "^0.18.5"
+	},
+	"devDependencies": {
+		"@directus/extensions-sdk": "14.0.0",
+		"vue": "^3.5.17"
 	}
 }
