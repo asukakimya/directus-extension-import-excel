@@ -1,84 +1,67 @@
 <template>
-  <private-view title="Importer un fichier Excel" class="import-excel-module">
-    <div class="step">
-      <h2>1️⃣ Choisissez la collection cible</h2>
-      <VSelect
-        v-model="selectedCollection"
-        :items="collections"
-        item-text="label"
-        item-value="value"
-        label="Collection"
-        placeholder="Sélectionnez une collection"
-        @update:modelValue="fetchFields"
-      />
-    </div>
+	<private-view title="Importer un fichier Excel" class="import-excel-module">
+		<div class="step">
+			<h2>1️⃣ Choisissez la collection cible</h2>
+			<h2>Trad : {{ t('step1') }}</h2>
+			<VSelect v-model="selectedCollection" :items="collections" item-text="label" item-value="value"
+				label="Collection" @update:modelValue="fetchFields" />
+		</div>
 
-    <div class="step">
-      <h2>2️⃣ Importez un fichier Excel</h2>
-      <VInput
-        type="file"
-        @change="handleFileUpload"
-        accept=".xlsx, .xls"
-        label="Fichier Excel"
-        placeholder="Choisissez un fichier Excel"
-      />
-      <p class="info-text">Formats acceptés : .xlsx, .xls</p>
-    </div>
+		<div class="step">
+			<h2>2️⃣ Importez un fichier Excel</h2>
+			<VInput type="file" @change="handleFileUpload" accept=".xlsx, .xls" label="Fichier Excel"
+				placeholder="Choisissez un fichier Excel" />
+			<p class="info-text">Formats acceptés : .xlsx, .xls</p>
+		</div>
 
-    <div v-if="previewData.length" class="step">
-      <h2>3️⃣ Aperçu & Mapping</h2>
-      <p class="info-text">Associez chaque colonne au champ cible :</p>
-      <div class="table-container">
-        <table class="preview-table">
-          <thead>
-            <tr>
-              <th v-for="(col, colIndex) in previewData[0]" :key="'header-' + colIndex">
-                Colonne {{ colIndex + 1 }}
-              </th>
-            </tr>
-            <tr>
-              <th v-for="(col, index) in previewData[0]" :key="'mapping-' + index">
-                <VSelect
-                  v-model="mapping[index]"
-                  :items="getAvailableFields(index)"
-                  item-text="label"
-                  item-value="value"
-                  clearable
-                  :inline="true"
-                  placeholder="Champ"
-                />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(row, rowIndex) in previewData" :key="rowIndex">
-              <td v-for="(col, colIndex) in row" :key="colIndex">{{ col }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+		<div v-if="previewData.length" class="step">
+			<h2>3️⃣ Mappage des colonnes</h2>
+			<p class="info-text">Associez chaque colonne du fichier à un champ dans la base de données. Un aperçu des
+				premières lignes est affiché.</p>
 
-    <div v-if="selectedFile" class="step">
-      <h2>4️⃣ Importer</h2>
-      <VButton
-        @click="importFile"
-        :disabled="!selectedCollection"
-        color="primary"
-      >
-        Importer
-      </VButton>
-    </div>
+			<div class="mapping-table">
+				<div class="mapping-row header">
+					<div class="column">Colonne source</div>
+					<div class="column">Exemple de données</div>
+					<div class="column">Champ cible</div>
+				</div>
 
-    <div v-if="successMessage" class="alert success">{{ successMessage }}</div>
-    <div v-if="errorMessage" class="alert error">{{ errorMessage }}</div>
-  </private-view>
+				<div v-for="(col, index) in previewData[0]" :key="'mapping-row-' + index" class="mapping-row">
+					<div class="column">Colonne {{ index + 1 }}</div>
+
+					<div class="column example-data">
+						<div v-for="row in previewData.slice(0, 3)" :key="'example-' + index + '-' + row[index]">
+							{{ row[index] }}
+						</div>
+					</div>
+
+					<div class="column">
+						<VSelect v-model="mapping[index]" :items="getAvailableFields(index)" item-text="label"
+							item-value="value" clearable placeholder="Champ" />
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div v-if="selectedFile" class="step">
+			<h2>4️⃣ Importer</h2>
+			<VButton @click="importFile" :disabled="!selectedCollection" color="primary">
+				Importer
+			</VButton>
+		</div>
+
+		<div v-if="successMessage" class="alert success">{{ successMessage }}</div>
+		<div v-if="errorMessage" class="alert error">{{ errorMessage }}</div>
+	</private-view>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useApi, useStores } from '@directus/extensions-sdk';
 import * as XLSX from 'xlsx';
+import { useI18n } from 'vue-i18n';
+import { resolveLocale } from '../shared/i18n';
 
 // Stores et API
 const api = useApi();
@@ -106,6 +89,57 @@ async function fetchProjectInfo() {
     console.error('❌ Impossible de récupérer la langue du projet', err);
   }
 }
+
+// Accès à la langue via le store Directus
+// const { useSettingsStore } = useStores();
+// const settingsStore = useSettingsStore();
+// const defaultLanguage = resolveLocale(settingsStore.settings?.default_language || 'en');
+
+// Traductions locales
+const messages = {
+  'en-US': {
+    choose_collection: 'Choose target collection',
+    import_excel: 'Upload an Excel file',
+    preview_mapping: 'Preview & Mapping',
+    import_button: 'Import',
+    choose_file: 'Choose an Excel file',
+    success: 'Import successful.',
+    error: 'An error occurred during import.',
+    step1: '1️⃣ Choose the target collection',
+    step2: '2️⃣ Upload an Excel file',
+    step3: '3️⃣ Preview & Mapping',
+    step4: '4️⃣ Import',
+    accepted_formats: 'Accepted formats: .xlsx, .xls',
+    no_valid_items: 'No valid items to import. Check the mapping.',
+    column: 'Column',
+    field: 'Field',
+    imported_success: 'items imported successfully.',
+  },
+  'fr_FR': {
+    choose_collection: 'Choisissez la collection cible',
+    import_excel: 'Importez un fichier Excel',
+    preview_mapping: 'Aperçu & Mapping',
+    import_button: 'Importer',
+    choose_file: 'Choisissez un fichier Excel',
+    success: 'Import réussi.',
+    error: 'Une erreur est survenue pendant l’import.',
+    step1: '1️⃣ Choisissez la collection cible',
+    step2: '2️⃣ Importez un fichier Excel',
+    step3: '3️⃣ Aperçu & Mapping',
+    step4: '4️⃣ Importer',
+    accepted_formats: 'Formats acceptés : .xlsx, .xls',
+    no_valid_items: 'Aucun élément valide à importer. Vérifiez le mapping.',
+    column: 'Colonne',
+    field: 'Champ',
+    imported_success: 'éléments importés avec succès.',
+  },
+};
+
+const { t } = useI18n({
+  locale: projectLanguage.value,
+  messages,
+});
+
 
 // 🔄 Récupère les collections visibles
 const availableCollections = computed(() =>
@@ -230,39 +264,51 @@ onMounted(async () => {
   margin-bottom: 30px;
   padding: 0 46px;
 }
-
-.table-container {
-  overflow-x: auto;
-  border: 1px solid var(--theme--border-normal);
-  border-radius: 6px;
+.mapping-table {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+  width: 60%;
+  max-width: 60%;
+  padding-right: 20px;
+  box-sizing: border-box;
 }
 
-.preview-table {
-  width: 100%;
-  border-collapse: collapse;
+.mapping-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr; /* Adapte selon le nombre et la taille des colonnes */
+  gap: 20px;
+  align-items: center;
 }
 
-.preview-table th,
-.preview-table td {
-  border: 1px solid var(--theme--border-normal);
-  padding: 8px;
+.mapping-row.header {
+  font-weight: bold;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 5px;
 }
 
-.preview-table th {
-  background: var(--theme--background-subdued);
-  color: var(--theme--foreground);
-  font-weight: 600;
+.column {
+  overflow-wrap: anywhere;
 }
 
-.preview-table td {
-  background: var(--theme--background);
-  color: var(--theme--foreground);
+.example-data {
+  font-family: monospace;
+  /* background-color: #f8f8f8; */
+  /* padding: 5px; */
+  font-style: italic;
+  font-size: 0.9em;
+  border-radius: 4px;
 }
 
+/* Alertes */
 .alert {
   padding: 12px 46px;
   border-radius: 6px;
   margin-top: 16px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .alert.success {
