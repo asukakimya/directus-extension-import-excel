@@ -77,12 +77,14 @@
       <h2>{{ t('importTitle') }}</h2>
       <VButton
         @click="importFile"
-        :disabled="!selectedCollection"
+        :disabled="!selectedCollection || isLoading"
+        :loading="isLoading"
         color="primary"
         :xLarge="true"
       >
         {{ t('importButton') }}
-      </VButton>
+    </VButton>
+
     </div>
 
     <div v-if="successMessage" class="alert success">{{ successMessage }}</div>
@@ -113,6 +115,8 @@ const mapping = ref({});
 const successMessage = ref('');
 const errorMessage = ref('');
 const projectLanguage = ref('');
+
+const isLoading = ref(false);
 
 const keyField = ref('');
 
@@ -182,6 +186,7 @@ function getAvailableFields(currentIndex) {
 async function importFile() {
   if (!selectedFile.value || !selectedCollection.value) return;
 
+  isLoading.value = true;
   successMessage.value = '';
   errorMessage.value = '';
 
@@ -191,7 +196,6 @@ async function importFile() {
     formData.append('collection', selectedCollection.value);
     formData.append('mapping', JSON.stringify(mapping.value));
 
-    // optional: send keyfield for upsert
     if (keyField.value) {
       formData.append('keyField', keyField.value);
     }
@@ -205,8 +209,11 @@ async function importFile() {
   } catch (err) {
     console.error('❌ Error when importing :', err);
     errorMessage.value = err?.response?.data?.message || 'An error has occurred during import.';
+  } finally {
+    isLoading.value = false;
   }
 }
+
 
 // 📁 Manage file upload
 function handleFileUpload(e) {
