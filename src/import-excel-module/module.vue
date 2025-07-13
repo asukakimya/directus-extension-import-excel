@@ -1,5 +1,5 @@
 <template>
-  <private-view :title="t('uploadExcelFile')" class="import-excel-module">
+  <private-view :title="t('title')" class="import-excel-module">
     <div class="step">
       <h2>{{ t('chooseCollection') }}</h2>
       <VSelect
@@ -95,7 +95,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useApi, useStores } from '@directus/extensions-sdk';
 import * as XLSX from 'xlsx';
 import { useI18n } from 'vue-i18n';
-import { resolveLocale, messages } from '../shared/i18n';
+import { messages } from '../shared/i18nModule';
 
 
 // Stores et API

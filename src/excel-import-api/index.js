@@ -1,7 +1,7 @@
 import multer from 'multer';
 import * as XLSX from 'xlsx';
 import { createError } from '@directus/errors';
-import { backendMessages } from '../shared/i18nBackend.js'; // chemin selon ton projet
+import { backendMessages } from '../shared/i18nApi.js'; // chemin selon ton projet
 
 // Petite fonction utilitaire de remplacement dans les messages
 function formatMessage(template, params) {

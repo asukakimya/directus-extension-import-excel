@@ -1,16 +1,7 @@
-export function resolveLocale(locale) {
-  if (locale) {
-    if (locale.includes('-')) {
-      return locale.split('-')[0].toLowerCase();
-    }
-    return locale.toLowerCase();
-  }
-  return 'en';
-}
-
 export const messages = {
   // IA translation for English
   'en-US': {
+    title: 'Import Excel',
     chooseCollection: '1️⃣ Choose target collection',
     uploadExcelFile: '2️⃣ Upload an Excel file',
     acceptedFormats: 'Accepted formats: .xlsx, .xls',
@@ -39,6 +30,7 @@ export const messages = {
   },
   // Original French translations
   'fr-FR': {
+    title: 'Importer un fichier Excel',
     chooseCollection: '1️⃣ Choisissez la collection cible',
     uploadExcelFile: '2️⃣ Importez un fichier Excel',
     acceptedFormats: 'Formats acceptés : .xlsx, .xls',
@@ -67,6 +59,7 @@ export const messages = {
   },
   // IA translation for Turkish
   'tr-TR': {
+    title: 'Excel İçe Aktar',
     acceptedFormats: "Only .xlsx or .xls formats are supported.",
     columnMappingHelp: "Match each column to the target field.",
     chooseCollection: '1️⃣ Hedef koleksiyonu seçin',
