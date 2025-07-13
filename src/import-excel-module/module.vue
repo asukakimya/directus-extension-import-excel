@@ -46,10 +46,11 @@
 
 		<div v-if="selectedFile" class="step">
 			<h2>4️⃣ Importer</h2>
-			<VButton @click="importFile" :disabled="!selectedCollection" color="primary">
+			<VButton @click="importFile" :disabled="!selectedCollection" color="primary" :xLarge="true">
 				Importer
 			</VButton>
 		</div>
+
 
 		<div v-if="successMessage" class="alert success">{{ successMessage }}</div>
 		<div v-if="errorMessage" class="alert error">{{ errorMessage }}</div>
@@ -190,42 +191,23 @@ async function importFile() {
   errorMessage.value = '';
 
   try {
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: 'array' });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+    const formData = new FormData();
+    formData.append('file', selectedFile.value);
+    formData.append('collection', selectedCollection.value);
+    formData.append('mapping', JSON.stringify(mapping.value));
 
-      const items = rows.map((row) => {
-        const payload = {};
-        for (const [colIndex, field] of Object.entries(mapping.value)) {
-          if (field) {
-            const cell = row[colIndex];
-            const value = cell !== undefined && cell !== null ? cell.toString().trim() : null;
-            if (value !== '' && value !== null) {
-              payload[field] = value;
-            }
-          }
-        }
-        return payload;
-      }).filter(item => Object.keys(item).length > 0);
+    const response = await api.post('/excel-import-api', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
 
-      if (items.length === 0) {
-        errorMessage.value = 'Aucun élément valide à importer. Vérifiez le mapping.';
-        return;
-      }
-
-      const result = await api.post(`/items/${selectedCollection.value}`, items);
-      successMessage.value = `${result.data.data.length} éléments importés avec succès.`;
-      console.log('✅ Import réussi', result);
-    };
-    reader.readAsArrayBuffer(selectedFile.value);
+    successMessage.value = response.data.message || 'Import réussi.';
+    console.log('✅ Import réussi', response);
   } catch (err) {
     console.error('❌ Erreur lors de l’import :', err);
-    errorMessage.value = err?.message || 'Une erreur est survenue pendant l’import.';
+    errorMessage.value = err?.response?.data?.message || 'Une erreur est survenue pendant l’import.';
   }
 }
+
 
 // 📁 Gérer l'upload du fichier
 function handleFileUpload(e) {

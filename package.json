@@ -43,7 +43,9 @@
 		"add": "directus-extension add"
 	},
 	"dependencies": {
+		"@directus/errors": "^2.0.2",
 		"@directus/sdk": "^20.0.0",
+		"multer": "^2.0.1",
 		"vue-i18n": "^11.1.9",
 		"xlsx": "^0.18.5"
 	},
