@@ -1,4 +1,5 @@
 export const backendMessages = {
+  // IA translation for English
   'en-US': {
     missingFile: 'Missing Excel file.',
     missingCollection: 'Missing target collection.',
@@ -10,6 +11,7 @@ export const backendMessages = {
     processedItems: '{count} items processed: {created} created, {updated} updated.',
     itemsCreated: '{count} items successfully created.',
   },
+  // Original French translations
   'fr-FR': {
     missingFile: 'Fichier Excel manquant.',
     missingCollection: 'Collection cible manquante.',
@@ -21,6 +23,7 @@ export const backendMessages = {
     processedItems: '{count} éléments traités : {created} créés, {updated} mis à jour.',
     itemsCreated: '{count} éléments créés avec succès.',
   },
+  // // IA translation for Turkish
   'tr-TR': {
     missingFile: 'Excel dosyası eksik.',
     missingCollection: 'Hedef koleksiyon eksik.',
