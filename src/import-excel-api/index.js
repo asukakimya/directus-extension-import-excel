@@ -20,9 +20,17 @@ export default function registerEndpoint(router, { services, getSchema }) {
       const lang = (req.headers['accept-language'] || 'en-US').split(',')[0];
       const messages = backendMessages[lang] || backendMessages['en-US'];
 
-      if (!req.file) throw createError('BAD_REQUEST', messages.missingFile, 400);
-      if (!req.body.collection) throw createError('BAD_REQUEST', messages.missingCollection, 400);
-      if (!req.body.mapping) throw createError('BAD_REQUEST', messages.missingMapping, 400);
+      if (!req.file) {
+        return res.status(400).json({ message: messages.missingFile });
+      }
+
+      if (!req.body.collection) {
+        return res.status(400).json({ message: messages.missingCollection });
+      }
+
+      if (!req.body.mapping) {
+        return res.status(400).json({ message: messages.missingMapping });
+      }
 
       const schema = await getSchema();
       const collectionName = req.body.collection;
@@ -38,7 +46,9 @@ export default function registerEndpoint(router, { services, getSchema }) {
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-      if (rows.length === 0) throw createError('BAD_REQUEST', messages.emptyFile, 400);
+      if (rows.length === 0) {
+        return res.status(400).json({ message: messages.emptyFile });
+      }
 
       const items = rows.map(row => {
         const item = {};
@@ -53,12 +63,15 @@ export default function registerEndpoint(router, { services, getSchema }) {
         return item;
       }).filter(item => Object.keys(item).length > 0);
 
-      if (items.length === 0) throw createError('BAD_REQUEST', messages.noValidItems, 400);
+     if (items.length === 0) {
+        return res.status(400).json({ message: messages.noValidItems });
+      }
+
 
       if (keyField) {
         const missingKey = items.find(item => !(keyField in item));
         if (missingKey) {
-          throw createError('BAD_REQUEST', formatMessage(messages.missingKeyForUpsert, { keyField }), 400);
+          return res.status(400).json({ message: formatMessage(messages.missingKeyForUpsert, { keyField }) });
         }
 
         const keyValues = [...new Set(items.map(item => item[keyField]))];
@@ -106,16 +119,13 @@ export default function registerEndpoint(router, { services, getSchema }) {
         });
       }
     } catch (error) {
-      console.error('Erreur import Excel :', error);
-
       const lang = (req.headers['accept-language'] || 'en-US').split(',')[0];
       const messages = backendMessages[lang] || backendMessages['en-US'];
-
       if (error.statusCode) {
-        res.status(error.statusCode).json({ message: error.message });
+        res.status(error.statusCode).json({ message: error });
       } else {
         res.status(500).json({
-          message: formatMessage(messages.internalError, { error: error.message }),
+          message: formatMessage(messages.internalError, { error: error }),
         });
       }
     }

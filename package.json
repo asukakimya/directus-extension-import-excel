@@ -23,13 +23,13 @@
 		"entries": [
 			{
 				"type": "module",
-				"name": "import-excel-module",
-				"source": "src/import-excel-module/index.js"
+				"name": "import-excel-ui",
+				"source": "src/import-excel-ui/index.js"
 			},
 			{
 				"type": "endpoint",
-				"name": "excel-import-api",
-				"source": "src/excel-import-api/index.js"
+				"name": "import-excel-api",
+				"source": "src/import-excel-api/index.js"
 			}
 		],
 		"host": "^10.8.0"

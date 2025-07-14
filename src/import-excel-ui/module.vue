@@ -1,5 +1,5 @@
 <template>
-  <private-view :title="t('title')" class="import-excel-module">
+  <private-view :title="t('title')" class="import-excel-ui">
     <div class="step">
       <h2>{{ t('chooseCollection') }}</h2>
       <VSelect
@@ -200,7 +200,7 @@ async function importFile() {
       formData.append('keyField', keyField.value);
     }
 
-    const response = await api.post('/excel-import-api', formData, {
+    const response = await api.post('/import-excel-api', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
 
