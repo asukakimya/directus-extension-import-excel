@@ -16,7 +16,7 @@
 
 ## 📸 Screenshots
 
-![Import Excel Extension](Screenshot.jpg)
+![Import Excel Extension](https://github.com/FazCodeFR/directus-extension-import-excel/raw/main/Screenshot.jpg)
 
 ## 📦 Installation
 
