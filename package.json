@@ -2,7 +2,7 @@
 	"name": "directus-extension-import-excel",
 	"description": "Import Excel files (.xlsx) without headers and manually map them to Directus collections.",
 	"icon": "upload_file",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"keywords": [
 		"directus",
 		"directus-extension",
