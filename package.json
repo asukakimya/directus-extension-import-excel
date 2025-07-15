@@ -1,5 +1,6 @@
 {
 	"name": "directus-extension-import-excel",
+	"homepage": "https://github.com/FazCodeFR/directus-extension-import-excel#readme",
 	"description": "Import Excel files (.xlsx) without headers and manually map them to Directus collections.",
 	"icon": "upload_file",
 	"version": "1.1.1",
@@ -52,5 +53,13 @@
 	"devDependencies": {
 		"@directus/extensions-sdk": "14.0.0",
 		"vue": "^3.5.17"
+	},
+	"main": "src/index.js",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/FazCodeFR/directus-extension-import-excel.git"
+	},
+	"bugs": {
+		"url": "https://github.com/FazCodeFR/directus-extension-import-excel/issues"
 	}
 }

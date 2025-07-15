@@ -29,6 +29,8 @@ Install directly from the **Directus Marketplace**
 Or search for `"fazcode"` or `"import excel"` (the name may evolve to reflect broader format support like JSON or CSV):  
 [http://YourDirectusUrl:8055/admin/settings/marketplace?search=import+excel](http://YourDirectusUrl:8055/admin/settings/marketplace?search=import+excel)
 
+
+
 ### 🛠 Manual Installation
 
 1. Clone the repository into your Directus `extensions` folder:

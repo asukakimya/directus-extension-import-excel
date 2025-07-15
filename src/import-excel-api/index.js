@@ -27,7 +27,7 @@ export default function registerEndpoint(router, { services, getSchema }) {
       if (!req.body.collection) {
         return res.status(400).json({ message: messages.missingCollection });
       }
-
+      
       if (!req.body.mapping) {
         return res.status(400).json({ message: messages.missingMapping });
       }

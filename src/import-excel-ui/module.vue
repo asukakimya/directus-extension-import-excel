@@ -199,7 +199,6 @@ async function importFile() {
     if (keyField.value) {
       formData.append('keyField', keyField.value);
     }
-
     const response = await api.post('/import-excel-api', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
