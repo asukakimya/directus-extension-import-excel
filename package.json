@@ -33,7 +33,7 @@
 				"source": "src/import-excel-api/index.js"
 			}
 		],
-		"host": "^10.8.0"
+    	"host": ">=10.10.10"
 	},
 	"scripts": {
 		"start": "vite",

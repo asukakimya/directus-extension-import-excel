@@ -24,11 +24,9 @@
 
 Install directly from the **Directus Marketplace**
 
-[http://YourDirectusUrl:8055/admin/settings/marketplace/extension/678ba940-192e-4524-949f-8881ad1436bb](http://YourDirectusUrl:8055/admin/settings/marketplace/extension/678ba940-192e-4524-949f-8881ad1436bb)
+Search for "Import Excel" or "Fazcode" in the Marketplace of your app settings, navigate to the extension page, and click "Install Extension"
 
-Or search for `"fazcode"` or `"import excel"` (the name may evolve to reflect broader format support like JSON or CSV):  
-[http://YourDirectusUrl:8055/admin/settings/marketplace?search=import+excel](http://YourDirectusUrl:8055/admin/settings/marketplace?search=import+excel)
-
+Don't forget to go to **Settings** > **Project Settings** > **Modules bars** > activate the "Import Excel" module to display it in the side menu.
 
 
 ### 🛠 Manual Installation
@@ -36,11 +34,13 @@ Or search for `"fazcode"` or `"import excel"` (the name may evolve to reflect br
 1. Clone the repository into your Directus `extensions` folder:
 
 ```bash
-git clone https://github.com/FazCodeFR/directus-extension-import-excel.git ./extensions/televersement
+git clone https://github.com/FazCodeFR/directus-extension-import-excel.git
+cd directus-extension-import-excel
+npm install
+npm run build
 ```
-
 2. Restart your Directus instance to load the new extension.
-3. Navigate to the Directus admin panel and find the **"Téléversement"** module in the side menu.
+3. Navigate to the Directus admin panel and find the **"Import Excel"** module in the side menu.
 
 ## 🧪 Usage
 
